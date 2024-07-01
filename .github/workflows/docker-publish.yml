@@ -36,7 +36,7 @@ jobs:
  
 
       - id: meta
-        run: echo "tags=${{ env.REGISTRY }}/cybrid/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+        run: echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.commit.outputs.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
         id: build-and-push
@@ -44,7 +44,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          path: True
+          path: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
       
