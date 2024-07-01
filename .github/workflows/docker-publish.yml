@@ -1,9 +1,9 @@
 name: Docker
 
 on:
-  push:
+  commit:
     branches: [ "main" ]
-    # Publish server tags as releases.
+    # Publish semver tags as releases.
     
 env:
   # Use docker.io for Docker Hub if empty
@@ -32,7 +32,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - id: commit
-        run: echo "commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT  
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT  
  
 
       - id: meta
