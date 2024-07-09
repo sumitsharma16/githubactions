@@ -13,16 +13,23 @@ env:
 
 
 jobs:
+  checkout:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+  
   build:
 
     runs-on: ubuntu-latest
+    needs: checkout
     permissions:
       contents: read
       packages: write
       
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    
 
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
