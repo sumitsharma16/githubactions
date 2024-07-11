@@ -2,9 +2,10 @@ name: Docker-txn
 
 on:
   push:
-    branches: [ "devops" ]
+    branches: 
+      - 'devops'
     paths:
-      - './cybrid-txn/**'
+      - '**cybrid-txn/**'
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
