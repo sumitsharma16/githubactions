@@ -3,8 +3,8 @@ name: Docker-txn
 on:
   push:
     branches: [ "devops" ]
-    # Publish semver tags as releases.
-    
+    paths:
+      - './cybrid-txn/**'
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
@@ -29,6 +29,7 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.TOKEN }}
+
 
       - id: commit
         run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT  
