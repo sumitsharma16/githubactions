@@ -9,7 +9,7 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: "${{ github.repository }}/cybrid-txn"
+  IMAGE_NAME: "${{ github.repository }}/cybrid-backend"
 
 
 jobs:
@@ -42,7 +42,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
-          context: .
+          context: ./cybrid-backend
           file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
