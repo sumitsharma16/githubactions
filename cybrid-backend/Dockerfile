@@ -1,4 +1,4 @@
 From amazonlinux
 COPY test.txt .
 COPY README.md .
-COPY devopsfile.txt 
+COPY devopsfile.txt .
