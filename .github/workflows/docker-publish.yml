@@ -46,6 +46,7 @@ jobs:
             echo "cybrid_txn=true" >> $GITHUB_ENV
           else
             echo "cybrid_txn=false" >> $GITHUB_ENV
+          fi
 
       # Log the changed files (for debugging)
       - name: github commits 
