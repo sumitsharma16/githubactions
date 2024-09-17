@@ -34,7 +34,9 @@ jobs:
 
       - id: meta
         run: echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.commit.outputs.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
-          echo "${{ steps.meta.outputs.tags }}"
+      - name: print tag
+        run : echo "${{ steps.meta.outputs.tags }}"
+      
 
      
       - name: Committing Tags
