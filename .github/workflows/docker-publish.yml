@@ -5,7 +5,7 @@ on:
     branches:
       - 'main'
     paths:
-      - '**cybrid-backend-service**'
+      - '**cybrid-backend**'
 
 env:
   REGISTRY: ghcr.io
