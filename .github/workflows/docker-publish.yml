@@ -31,11 +31,15 @@ jobs:
       - name: Get Commit SHA
         id: commit
         run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_ENV
-
+    
       - id: meta
-        run: echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.commit.outputs.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+        run: |
+          echo "tag=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.commit.outputs.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+          
       - name: print tag
-        run : echo "${{ steps.meta.outputs.tags }}"
+        run: |
+          echo "${{ steps.meta.outputs.tags }}"
+          echo "${{ steps.commit.outputs.sha }}"
 
       - name: Build and push Docker image
         id: build-and-push
@@ -44,7 +48,7 @@ jobs:
           context: ./cybrid-backend-service
           file: ./cybrid-backend-service/Dockerfile
           push: true
-          tags: ${{ steps.commit.outputs.sha }}
+          tags: ${{ steps.meta.outputs.tag }}
       
 
      
