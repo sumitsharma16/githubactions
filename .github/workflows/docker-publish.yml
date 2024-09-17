@@ -44,13 +44,13 @@ jobs:
           context: ./cybrid-backend-service
           file: ./cybrid-backend-service/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.sha }}
+          tags: ${{ steps.commit.outputs.sha }}
       
 
      
       - name: Committing Tags
         env:
-          TAGS: ${{ steps.meta.outputs.tags }}
+          TAGS: ${{ steps.commit.outputs.tags }}
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: | 
           echo $TAGS
