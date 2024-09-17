@@ -1,60 +1,52 @@
-name: Build and Push Cybrid Backend Image
+name: Build and Deploy Services
 
 on:
   push:
-    branches:
-      - 'devops'
-   
+    paths:
+      - 'cybrid-backend/**'  
+      - 'cybrid-txn/**'  
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: "${{ github.repository }}/cybrid-backend"
 
 jobs:
-  build-and-publish:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
+      # Checkout code
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get Commit SHA
-        id: commit
-        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-    
-      - id: meta
+      # Determine which services to build and deploy
+      - name: Set services to build
+        id: set_services
         run: |
-          echo "tag=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.commit.outputs.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+          echo "CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)" >> $GITHUB_ENV
+          if echo "$CHANGED_FILES" | grep -q '^cybrid-backend/'; then
+            echo "cybrid-backend=true" >> $GITHUB_ENV
+          fi
+          if echo "$CHANGED_FILES" | grep -q '^cybrid-txn/'; then
+            echo "cybrid-txn=true" >> $GITHUB_ENV
+          fi
+
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Log in to Docker Hub (or private registry)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Conditionally build and deploy service1
+      - name: Build and deploy cybrid Backend 
+        if: env.cybrid-backend == 'true'
+        run: echo "cybrid Backend service"
+       
+      # Conditionally build and deploy service2
+      - name: Build and deploy cybrid txn
+        if: env.cybrid-txn == 'true'
+        run: echo "cybrid txn service"
+
           
-      - name: print tag
-        run: |
-          echo "${{ steps.commit.outputs.sha }}"
-
-      - name: Build and push Docker image
-        id: build-and-push
-        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
-        with:
-          context: ./cybrid-backend-service
-          file: ./cybrid-backend-service/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tag }}
-      
-
-     
-      - name: Committing Tags
-        env:
-          TAGS: ${{ steps.commit.outputs.tags }}
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: | 
-          echo $TAGS
-          echo $TAGS >> $GITHUB_STEP_SUMMARY
