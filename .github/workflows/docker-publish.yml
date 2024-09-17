@@ -38,12 +38,12 @@ jobs:
      
       # Conditionally build and deploy service1
       - name: Build and deploy cybrid Backend 
-        if: env.cybrid-backend == 'true'
+        if: ${{ steps.set_service.outputs.cybrid-backend }} == 'true'
         run: echo "cybrid Backend service"
        
       # Conditionally build and deploy service2
       - name: Build and deploy cybrid txn
-        if: env.cybrid-txn == 'true'
+        if: ${{ steps.set_service.outputs.cybrid-txn }} == 'true'
         run: echo "cybrid txn service"
 
           
