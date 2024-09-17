@@ -30,6 +30,8 @@ jobs:
           if echo "$CHANGED_FILES" | grep -q '^cybrid-txn/'; then
             echo "cybrid-txn=true" >> $GITHUB_ENV
           fi
+      - name: github commits 
+        run: echo "${{ steps.set_service.outputs.CHANGED_FILES }}"
 
       # Set up Docker Buildx
       - name: Set up Docker Buildx
