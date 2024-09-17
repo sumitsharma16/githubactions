@@ -26,9 +26,6 @@ jobs:
       - name: Set services to build
         id: set_services
         run: |
-          cybrid-backend=false
-          cybrid-txn=false
-          
           echo "CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)" >> $GITHUB_ENV
           if echo "$CHANGED_FILES" | grep -q '^cybrid-backend/'; then
             echo "{{ env.CYBRID-BACKEND }}=true" >> $GITHUB_ENV
