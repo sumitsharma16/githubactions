@@ -5,11 +5,7 @@ on:
     branches: ['devops']
     paths:
       - 'cybrid-backend/**'  
-      - 'cybrid-txn/**'  
-
-env:
-  CYBRID-BACKEND: false
-  CYBRID-TXN: false
+      - 'cybrid-txn/**'
 
 jobs:
   build-and-deploy:
@@ -22,31 +18,45 @@ jobs:
         with:
           fetch-depth: 2 
 
+      # Input parameters (with default values)
+      - name: Set input defaults
+        id: input_defaults
+        run: |
+          echo "cybrid_backend_input=false" >> $GITHUB_ENV
+          echo "cybrid_txn_input=false" >> $GITHUB_ENV
+
+      # Check if input variables are passed
+      - name: Set inputs from action
+        id: set_inputs
+        run: |
+          echo "cybrid_backend_input=${{ github.event.inputs.cybrid-backend || 'false' }}" >> $GITHUB_ENV
+          echo "cybrid_txn_input=${{ github.event.inputs.cybrid-txn || 'false' }}" >> $GITHUB_ENV
+
       # Determine which services to build and deploy
       - name: Set services to build
         id: set_services
         run: |
           echo "CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)" >> $GITHUB_ENV
           if echo "$CHANGED_FILES" | grep -q '^cybrid-backend/'; then
-            echo "{{ env.CYBRID-BACKEND }}=true" >> $GITHUB_ENV
+            echo "cybrid_backend=true" >> $GITHUB_ENV
+          else
+            echo "cybrid_backend=false" >> $GITHUB_ENV
           fi
           if echo "$CHANGED_FILES" | grep -q '^cybrid-txn/'; then
-            echo  "{{ env.CYBRID-TXN }}=true" >> $GITHUB_ENV
-          fi
+            echo "cybrid_txn=true" >> $GITHUB_ENV
+          else
+            echo "cybrid_txn=false" >> $GITHUB_ENV
+
+      # Log the changed files (for debugging)
       - name: github commits 
         run: echo "${{ steps.set_service.outputs.CHANGED_FILES }}"
 
-    
-      # Log in to Docker Hub (or private registry)
-     
-      # Conditionally build and deploy service1
+      # Conditionally build and deploy cybrid Backend
       - name: Build and deploy cybrid Backend 
-        if: ${{ env.CYBRID-BACKEND }} == 'true'
-        run: echo "cybrid Backend service"
+        if: env.cybrid_backend == 'true' || env.cybrid_backend_input == 'true'
+        run: echo "Building and deploying cybrid Backend service"
        
-      # Conditionally build and deploy service2
+      # Conditionally build and deploy cybrid txn
       - name: Build and deploy cybrid txn
-        if: ${{ env.CYBRID-TXN }} == 'true'
-        run: echo "cybrid txn service"
-
-          
+        if: env.cybrid_txn == 'true' || env.cybrid_txn_input == 'true'
+        run: echo "Building and deploying cybrid txn service"
