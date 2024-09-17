@@ -3,9 +3,8 @@ name: Build and Push Cybrid Backend Image
 on:
   push:
     branches:
-      - 'main'
-    paths:
-      - '**cybrid-backend**'
+      - 'devops'
+   
 
 env:
   REGISTRY: ghcr.io
