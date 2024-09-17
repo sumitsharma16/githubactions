@@ -44,7 +44,7 @@ jobs:
           context: ./cybrid-backend-service
           file: ./cybrid-backend-service/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.sha }}
       
 
      
