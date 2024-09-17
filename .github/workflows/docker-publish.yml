@@ -7,6 +7,9 @@ on:
       - 'cybrid-backend/**'  
       - 'cybrid-txn/**'  
 
+env:
+  CYBRID-BACKEND: false
+  CYBRID-TXN: false
 
 jobs:
   build-and-deploy:
@@ -28,10 +31,10 @@ jobs:
           
           echo "CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)" >> $GITHUB_ENV
           if echo "$CHANGED_FILES" | grep -q '^cybrid-backend/'; then
-            echo "cybrid-backend=true" >> $GITHUB_ENV
+            echo "{{ env.CYBRID-BACKEND }}=true" >> $GITHUB_ENV
           fi
           if echo "$CHANGED_FILES" | grep -q '^cybrid-txn/'; then
-            echo "cybrid-txn=true" >> $GITHUB_ENV
+            echo  "{{ env.CYBRID-TXN }}=true" >> $GITHUB_ENV
           fi
       - name: github commits 
         run: echo "${{ steps.set_service.outputs.CHANGED_FILES }}"
@@ -41,12 +44,12 @@ jobs:
      
       # Conditionally build and deploy service1
       - name: Build and deploy cybrid Backend 
-        if: ${{ steps.set_service.outputs.cybrid-backend }} == 'true'
+        if: ${{ env.CYBRID-BACKEND }} == 'true'
         run: echo "cybrid Backend service"
        
       # Conditionally build and deploy service2
       - name: Build and deploy cybrid txn
-        if: ${{ steps.set_service.outputs.cybrid-txn }} == 'true'
+        if: ${{ env.CYBRID-TXN }} == 'true'
         run: echo "cybrid txn service"
 
           
