@@ -36,6 +36,15 @@ jobs:
         run: echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.commit.outputs.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
       - name: print tag
         run : echo "${{ steps.meta.outputs.tags }}"
+
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+        with:
+          context: ./cybrid-backend-service
+          file: ./cybrid-backend-service/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
       
 
      
