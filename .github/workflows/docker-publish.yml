@@ -38,18 +38,13 @@ jobs:
         run: |
           echo "CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)" >> $GITHUB_ENV
           if echo "$CHANGED_FILES" | grep -q '^cybrid-backend/**'; then
-            echo "cybrid_backend=true" >> $GITHUB_ENV
-            echo "$GITHUB_ENV"
-          else
-            echo "cybrid_backend=false" >> $GITHUB_ENV
-             echo "$GITHUB_ENV"
+             ${{ steps.set_service.outputs.cybrid_backend }}=true
+            
           fi
+          
           if echo "$CHANGED_FILES" | grep -q '^cybrid-txn/**'; then
-            echo "cybrid_txn=true" >> $GITHUB_ENV
-            echo "$GITHUB_ENV"
-          else
-            echo "cybrid_txn=false" >> $GITHUB_ENV
-            echo "$GITHUB_ENV"
+            ${{ steps.set_service.outputs.cybrid_txn }}=true
+        
           fi
 
       # Log the changed files (for debugging)
@@ -58,10 +53,10 @@ jobs:
 
       # Conditionally build and deploy cybrid Backend
       - name: Build and deploy cybrid Backend 
-        if: env.cybrid_backend == 'true' || env.cybrid_backend_input == 'true'
+        if: ${{ steps.set_service.outputs.cybrid_backend }} == 'true' 
         run: echo "Building and deploying cybrid Backend service"
        
       # Conditionally build and deploy cybrid txn
       - name: Build and deploy cybrid txn
-        if: env.cybrid_txn == 'true' || env.cybrid_txn_input == 'true'
+        if: ${{ steps.set_service.outputs.cybrid_txn }} == 'true' 
         run: echo "Building and deploying cybrid txn service"
