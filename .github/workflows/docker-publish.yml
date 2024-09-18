@@ -37,14 +37,14 @@ jobs:
         id: set_services
         run: |
           echo "CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)" >> $GITHUB_ENV
-          if echo "$CHANGED_FILES" | grep -q '^cybrid-backend/'; then
+          if echo "$CHANGED_FILES" | grep -q '^cybrid-backend/**'; then
             echo "cybrid_backend=true" >> $GITHUB_ENV
             echo "$GITHUB_ENV"
           else
             echo "cybrid_backend=false" >> $GITHUB_ENV
              echo "$GITHUB_ENV"
           fi
-          if echo "$CHANGED_FILES" | grep -q '^cybrid-txn/'; then
+          if echo "$CHANGED_FILES" | grep -q '^cybrid-txn/**'; then
             echo "cybrid_txn=true" >> $GITHUB_ENV
             echo "$GITHUB_ENV"
           else
