@@ -20,45 +20,42 @@ jobs:
 
       # Input parameters (with default values)
       - name: Set input defaults
-        id: input_defaults
         run: |
           echo "cybrid_backend_input=false" >> $GITHUB_ENV
           echo "cybrid_txn_input=false" >> $GITHUB_ENV
 
       # Check if input variables are passed
       - name: Set inputs from action
-        id: set_inputs
         run: |
           echo "cybrid_backend_input=${{ github.event.inputs.cybrid-backend || 'false' }}" >> $GITHUB_ENV
           echo "cybrid_txn_input=${{ github.event.inputs.cybrid-txn || 'false' }}" >> $GITHUB_ENV
 
       # Determine which services to build and deploy
       - name: Set services to build
-        id: set_services
         run: |
           echo "CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)" >> $GITHUB_ENV
           if echo "$CHANGED_FILES" | grep -q '^cybrid-backend/'; then
-            echo "::set-output name=cybrid_backend::true"
+            echo "cybrid_backend=true" >> $GITHUB_ENV
           else
-            echo "::set-output name=cybrid_backend::false"
+            echo "cybrid_backend=false" >> $GITHUB_ENV
           fi
           
           if echo "$CHANGED_FILES" | grep -q '^cybrid-txn/'; then
-            echo "::set-output name=cybrid_txn::true"
+            echo "cybrid_txn=true" >> $GITHUB_ENV
           else
-            echo "::set-output name=cybrid_txn::false"
+            echo "cybrid_txn=false" >> $GITHUB_ENV
           fi
 
       # Log the changed files (for debugging)
       - name: Log changed files
-        run: echo "Changed file ${{ env.CHANGED_FILES }}"
+        run: echo "Changed files ${{ env.CHANGED_FILES }}"
 
       # Conditionally build and deploy cybrid Backend
       - name: Build and deploy cybrid Backend 
-        if: ${{ steps.set_services.outputs.cybrid_backend }} == 'true'
+        if: env.cybrid_backend == 'true'
         run: echo "Building and deploying cybrid Backend service"
        
       # Conditionally build and deploy cybrid txn
       - name: Build and deploy cybrid txn
-        if: ${{ steps.set_services.outputs.cybrid_txn }} == 'true'
+        if: env.cybrid_txn == 'true'
         run: echo "Building and deploying cybrid txn service"
