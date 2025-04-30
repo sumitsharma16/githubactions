@@ -16,22 +16,6 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    name: Deploy AWS Glue Jobs
-on:
-  push:
-    branches:
-      - main  
-    paths:
-      - 'glue_jobs/*.py'
-
-jobs:
-  deploy_glue_jobs:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
-
     - name: Get list of modified Glue job scripts
       id: changed_files
       run: |
