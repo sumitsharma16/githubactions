@@ -1,2 +1,2 @@
 print("This is abc job")
-print("trigger")
+print("strigger")
