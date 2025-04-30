@@ -2,6 +2,8 @@ name: Detect and Print Changed Glue Job Files
 
 on:
   push:
+    branches:
+      - main
     paths:
       - 'glue_jobs/*.py'
 
