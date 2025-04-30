@@ -1,4 +1,22 @@
+# .github/workflows/deploy-glue-jobs.yml
 name: Deploy AWS Glue Jobs
+
+on:
+  push:
+    branches:
+      - main  
+    paths:
+      - 'glue_jobs/*.py'
+
+jobs:
+  deploy_glue_jobs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    name: Deploy AWS Glue Jobs
 on:
   push:
     branches:
@@ -17,7 +35,14 @@ jobs:
     - name: Get list of modified Glue job scripts
       id: changed_files
       run: |
-        echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^glue_jobs/.*\.py$' | xargs)" >> $GITHUB_OUTPUT
+        files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^glue_jobs/.*\.py$' || true)
+        echo "changed_files=${files}" >> "$GITHUB_OUTPUT"
+
+    - name: Deploy modified Glue jobs
+      run: |
+        echo ${{ changed_files }}
+       
+
 
     - name: Deploy modified Glue jobs
       run: |
