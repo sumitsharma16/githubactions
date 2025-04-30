@@ -1,34 +1,49 @@
-# .github/workflows/deploy-glue-jobs.yml
 name: Deploy AWS Glue Jobs
 
 on:
   push:
     branches:
-      - main  
+      - main
     paths:
       - 'glue_jobs/*.py'
 
 jobs:
-  deploy_glue_jobs:
+  detect_changes:
     runs-on: ubuntu-latest
+    outputs:
+      jobs: ${{ steps.set-matrix.outputs.jobs }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get changed files
+        id: get-changes
+        run: |
+          echo "Changed files:"
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^glue_jobs/.*\.py$' || true
+
+      - name: Set matrix jobs
+        id: set-matrix
+        run: |
+          files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^glue_jobs/.*\.py$' | sed 's|glue_jobs/||' | sed 's|.py||' | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          echo "Detected jobs: $files"
+          echo "jobs=$files" >> $GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
+
+  deploy_glue_jobs:
+    needs: detect_changes
+    runs-on: ubuntu-latest
+    if: needs.detect_changes.outputs.jobs != '[]'
+    strategy:
+      matrix:
+        job_name: ${{ fromJson(needs.detect_changes.outputs.jobs) }}
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Get list of modified Glue job scripts
-      id: changed_files
-      run: |
-        files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^glue_jobs/.*\.py$' || true)
-        echo "changed_files=${files}" >> "$GITHUB_OUTPUT"
+     
 
-    - name: Deploy modified Glue jobs
-      run: |
-        echo ${{ changed_files }}
-       
-
-
-    - name: Deploy modified Glue jobs
-      run: |
-        echo ${{ changed_files }}
-       
+      - name: Deploy AWS Glue Job
+        run: | 
+          echo ${{ files }}
