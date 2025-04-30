@@ -1,23 +1,38 @@
-# .github/workflows/detect-changes.yml
-name: Detect Changed Glue Job Files
+name: Detect and Print Changed Glue Job Files
 
 on:
   push:
-    branches:
-      - main
     paths:
       - 'glue_jobs/*.py'
 
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Fetch full history so git diff works
 
-      - name: Show changed files
+      - name: Get changed Python files
+        id: get-changes
         run: |
-          echo "Changed files in glue_jobs/:"
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^glue_jobs/.*\.py$' || echo "No changes detected."
+          # Get a list of changed Python files in glue_jobs/
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^glue_jobs/.*\.py$' | sed 's|glue_jobs/||')
+          echo "Changed files: $changed_files"
+          
+          # Store the file names in an array
+          files_array=($changed_files)
+          
+          # Output the list of files for the next step
+          echo "files_array=${files_array[@]}" >> $GITHUB_ENV
+
+      - name: Print the content of each changed Python file
+        run: |
+          # Loop through the array of file names and print their content
+          for file in ${files_array[@]}; do
+            echo "=== Printing content of $file ==="
+            cat "glue_jobs/$file"
+            echo "=============================="
+          done
