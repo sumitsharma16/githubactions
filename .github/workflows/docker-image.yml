@@ -1,0 +1,58 @@
+name: Build and Push MNEE Portal Image
+
+on:
+  push:
+    branches:
+      - 'main'
+    
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: "${{ github.repository }}/mnee-portal"
+  # PORTAL_SSH_HOST: "10.15.143.208"
+  # PORTAL_SSH_PORT: "22"
+  # PORTAL_SSH_USERNAME: "ec2-user"
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Commit SHA
+        id: commit
+        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+    
+      - id: meta
+        run: |
+          echo "tag=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.commit.outputs.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+
+      - name: Set Node.js 23.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23.x
+
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+          
+      - name: Build and Push Docker Image
+        id: build-and-push
+        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+        with:
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tag }}
