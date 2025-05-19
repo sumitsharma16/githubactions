@@ -17,24 +17,25 @@ jobs:
         with:
           fetch-depth: 0  # Fetch full history so git diff works
 
-      - name: Get changed Python files
-        id: get-changes
-        run: |
-          # Get a list of changed Python files in glue_jobs/
-          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^glue_jobs/.*\.py$' | sed 's|glue_jobs/||')
-          echo "Changed files: $changed_files"
+      # - name: Get changed Python files
+      #   id: get-changes
+      #   run: |
+      #     # Get a list of changed Python files in glue_jobs/
+      #     changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^glue_jobs/.*\.py$' | sed 's|glue_jobs/||')
+      #     echo "Changed files: $changed_files"
           
-          # Store the file names in an array
-          files_array=($changed_files)
+      #     # Store the file names in an array
+      #     files_array=($changed_files)
           
-          # Output the list of files for the next step
-          echo "files_array=${files_array[@]}" >> $GITHUB_ENV
+      #     # Output the list of files for the next step
+      #     echo "files_array=${files_array[@]}" >> $GITHUB_ENV
 
       - name: Print the content of each changed Python file
         run: |
+            bash glue_jobs/scripts/test.sh
           # Loop through the array of file names and print their content
-          for file in ${files_array[@]}; do
-            echo "=== Printing content of $file ==="
-            cat "glue_jobs/$file"
-            echo "=============================="
-          done
+          # for file in ${files_array[@]}; do
+          #   echo "=== Printing content of $file ==="
+          #   cat "glue_jobs/$file"
+          #   echo "=============================="
+          # done
