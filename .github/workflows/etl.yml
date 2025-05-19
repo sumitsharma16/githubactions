@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'glue_jobs/*.py'
+      - '**glue_jobs/scripts**'
 
 jobs:
   detect-changes:
